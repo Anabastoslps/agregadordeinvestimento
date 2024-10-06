@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
 @RestController//indicar que a classe e um controlador
 @RequestMapping("/v1/users") // caminho da api
@@ -21,13 +22,13 @@ public class UserController {
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody CreateUserDTO createUserDTO) {
         var userId = userService.createUser(createUserDTO);
-        return ResponseEntity.created(URI.create("/v1/users" + userId.toString())).build();
+        return ResponseEntity.created(URI.create("/v1/users/" + userId.toString())).build();
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<User> getUserById(@PathVariable("userId") String userId){
+    public ResponseEntity<User> getUserById(@PathVariable("userId") UUID userId) {
         var user = userService.getUserById(userId);
-        if (user.isPresent()){ //se o usuario existe, uma condicional
+        if (user.isPresent()) { //se o usuario existe, uma condicional
             return ResponseEntity.ok(user.get());
         } else {
             return ResponseEntity.notFound().build();
@@ -41,15 +42,15 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    @PutMapping
-    public ResponseEntity<Void> updateUserById(@PathVariable("userId") String userId,
+    @PutMapping("/{userId}")
+    public ResponseEntity<Void> updateUserById(@PathVariable("userId") UUID userId,
                                                @RequestBody UpdateUserDto updateUserDto){
         userService.updateUserById(userId, updateUserDto);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{userId}")// deletar e para um ussuario especifico
-    public ResponseEntity<Void> deleteById(@PathVariable("userId") String userId){
+    public ResponseEntity<Void> deleteById(@PathVariable("userId") UUID userId){
         userService.deleteById(userId);
         return ResponseEntity.noContent().build();
     }

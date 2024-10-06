@@ -23,59 +23,49 @@ public class UserService {
     }
 
     public UUID createUser(CreateUserDTO createUserDTO){
-
-        //dto converter para entity para usar o entity ali embaixo
-
-       var entity = new User(
+        var entity = new User(
                 UUID.randomUUID(),
                 createUserDTO.username(),
                 createUserDTO.email(),
                 createUserDTO.password(),
-                Instant.now(),//data de criação
-                null); //data de finalização
-
+                Instant.now(),
+                null
+        );
         var userSaved = userRepository.save(entity);
-
         return userSaved.getUserId();
     }
 
-    public Optional<User> getUserById(String userId){
-
-        return  userRepository.findById(UUID.fromString(userId));
+    public Optional<User> getUserById(UUID userId){
+        return userRepository.findById(userId);
     }
-    public List<User>listusers(){
+
+    public List<User> listusers(){
         return userRepository.findAll();
     }
 
-    public void updateUserById(String userId,
-                               UpdateUserDto updateUserDto){
-        var id = UUID.fromString(userId);
+    public void updateUserById(UUID userId, UpdateUserDto updateUserDto) {
+        var userEntity = userRepository.findById(userId); // Correção aqui
 
-        var userEntity = userRepository.findById(id);
-
-        if (userEntity.isPresent()){
+        if (userEntity.isPresent()) {
             var user = userEntity.get();
 
-            if (updateUserDto.username() != null){
+            if (updateUserDto.username() != null) {
                 user.setUsername(updateUserDto.username());
             }
 
-            if (updateUserDto.password() != null){
+            if (updateUserDto.password() != null) {
                 user.setPassword(updateUserDto.password());
-        }
+            }
             userRepository.save(user);
+        }
     }
 
-        userRepository.deleteById(id);
-    }
+    public void deleteById(UUID userId) {
+        var userExists = userRepository.existsById(userId); // Correção aqui
 
-    public void deleteById(String userId){
-        var id = UUID.fromString(userId);
-
-        var userExists = userRepository.existsById(id);
-
-        if (userExists){
-            userRepository.deleteById(id);
+        if (userExists) {
+            userRepository.deleteById(userId);
         }
     }
 }
+
